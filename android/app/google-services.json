@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "312381412536",
+    "project_id": "jibber-6deca",
+    "storage_bucket": "jibber-6deca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:312381412536:android:2fd7d34bdc48879e9f904d",
+        "android_client_info": {
+          "package_name": "com.example.jibber"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAi4hY6QZ-Lh2IERbpnKjVDgzFTD9TelgU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
