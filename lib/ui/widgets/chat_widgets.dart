@@ -1,84 +1,126 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
 import 'package:jibber/core/constants/typography.dart';
 import 'package:jibber/core/models/message_model.dart';
-import 'package:jibber/ui/widgets/custom_textfield.dart';
-
-class BottomField extends StatelessWidget {
-  const BottomField({super.key, this.onTap, this.onChanged, this.controller});
-  final void Function()? onTap;
-  final void Function(String)? onChanged;
-  final TextEditingController? controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 1.sw * 0.05, vertical: 25.h),
-      child: Row(
-        children: [
-          InkWell(
-            onTap: null,
-            child: CircleAvatar(
-              radius: 20.r,
-              child: const Icon(Icons.add),
-            ),
-          ),
-          10.horizontalSpace,
-          Expanded(
-              child: CustomTextfield(
-            controller: controller,
-            isChatText: true,
-            hintText: "Write message..",
-            onChanged: onChanged,
-            onTap: onTap,
-          ))
-        ],
-      ),
-    );
-  }
-}
 
 class ChatBubble extends StatelessWidget {
-  const ChatBubble(
-      {super.key, this.isCurrentUser = true, required this.message});
+  const ChatBubble({
+    super.key,
+    required this.isCurrentUser,
+    required this.message,
+  });
+
   final bool isCurrentUser;
   final Message message;
 
   @override
   Widget build(BuildContext context) {
-    final borderRadius = isCurrentUser
-        ? BorderRadius.only(
-            topLeft: Radius.circular(16.r),
-            topRight: Radius.circular(16.r),
-            bottomLeft: Radius.circular(16.r))
-        : BorderRadius.only(
-            topLeft: Radius.circular(16.r),
-            topRight: Radius.circular(16.r),
-            bottomRight: Radius.circular(16.r));
-    final alignment =
-        isCurrentUser ? Alignment.centerRight : Alignment.centerLeft;
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+    final onPrimaryColor = theme.colorScheme.onPrimary;
+
     return Align(
-      alignment: alignment,
+      alignment: isCurrentUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: BoxConstraints(maxWidth: 1.sw * 0.75, minWidth: 50.w),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(borderRadius: borderRadius),
+        margin: EdgeInsets.symmetric(vertical: 4.h),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+        decoration: BoxDecoration(
+          color: isCurrentUser ? primaryColor : primaryColor.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16.r),
+        ),
         child: Column(
-          crossAxisAlignment:
-              isCurrentUser ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              message.content!,
-              style: body,
+              message.content ?? '',
+              style: body.copyWith(
+                color: isCurrentUser ? onPrimaryColor : primaryColor,
+              ),
             ),
-            5.verticalSpace,
+            SizedBox(height: 4.h),
             Text(
-              DateFormat('hh:mm a').format(message.timestamp!),
-              style: small,
-            )
+              _formatTimestamp(message.timestamp),
+              style: small.copyWith(
+                color: isCurrentUser
+                    ? onPrimaryColor.withOpacity(0.7)
+                    : primaryColor.withOpacity(0.7),
+              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+
+  String _formatTimestamp(DateTime? timestamp) {
+    if (timestamp == null) return '';
+    return '${timestamp.hour}:${timestamp.minute.toString().padLeft(2, '0')}';
+  }
+}
+
+class BottomField extends StatelessWidget {
+  const BottomField({
+    super.key,
+    required this.controller,
+    required this.onTap,
+  });
+
+  final TextEditingController controller;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: const Offset(0, -1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: controller,
+              decoration: InputDecoration(
+                hintText: 'Type a message...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24.r),
+                  borderSide: BorderSide(color: theme.colorScheme.primary),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24.r),
+                  borderSide: BorderSide(
+                      color: theme.colorScheme.primary.withOpacity(0.5)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(24.r),
+                  borderSide:
+                      BorderSide(color: theme.colorScheme.primary, width: 2),
+                ),
+                filled: true,
+                fillColor: theme.inputDecorationTheme.fillColor ??
+                    theme.colorScheme.surface,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              ),
+            ),
+          ),
+          SizedBox(width: 8.w),
+          IconButton(
+            icon: const Icon(Icons.send),
+            color: theme.colorScheme.primary,
+            onPressed: onTap,
+          ),
+        ],
       ),
     );
   }
